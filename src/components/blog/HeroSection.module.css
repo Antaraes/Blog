@@ -1,0 +1,14 @@
+.title {
+  width: 50%;
+  text-align: center;
+  margin: auto;
+  font-size: 54px;
+}
+
+.body {
+  width: 30%;
+  line-height: 2;
+  text-align: center;
+  margin: auto;
+  font-size: 20px;
+}
