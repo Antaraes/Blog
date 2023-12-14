@@ -1,0 +1,17 @@
+.section {
+  width: 60%;
+  margin: auto;
+  margin-bottom: 10rem;
+}
+.blog {
+  cursor: pointer;
+  text-decoration: none;
+  color: black;
+  padding: 4px;
+  margin-bottom: 10px;
+}
+@media (max-width: 700px) {
+  .section {
+    width: 90%;
+  }
+}

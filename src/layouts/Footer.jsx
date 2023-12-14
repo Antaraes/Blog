@@ -1,4 +1,4 @@
-import { footerBrandMarquee } from "@/utils";
+import { footerBrandMarquee } from "@/constants";
 import React from "react";
 import { Container, Nav } from "react-bootstrap";
 const Footer = () => {
