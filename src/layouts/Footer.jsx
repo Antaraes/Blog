@@ -5,8 +5,10 @@ const Footer = () => {
   return (
     <Container fluid className="bg-dark p-3">
       <marquee behavior="" direction="left" className="text-light">
-        {footerBrandMarquee.map((item) => (
-          <span className="m-3 font-bold text-lg text-uppercase">{item}</span>
+        {footerBrandMarquee.map((item, index) => (
+          <span key={index} className="m-3 font-bold text-lg text-uppercase">
+            {item}
+          </span>
         ))}
       </marquee>
       <Container className="text-light text-center w-50 mt-5">

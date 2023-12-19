@@ -7,7 +7,7 @@ const BlogListPage = () => {
   return (
     <Container>
       <HeroSection />
-      <BlogListSection />
+      <BlogListSection title={"All Articles"} />
     </Container>
   );
 };

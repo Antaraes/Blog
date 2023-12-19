@@ -10,3 +10,4 @@ export { default as image_9 } from "@/assets/images/9.png";
 export { default as image_10 } from "@/assets/images/10.png";
 export { default as image_11 } from "@/assets/images/11.png";
 export { default as image_12 } from "@/assets/images/12.png";
+export { default as author } from "@/assets/images/author.png";
