@@ -1,8 +1,11 @@
 import SignUpSellterService from "@/services/SignUpSellterService";
+import { Formik } from "formik";
 import React from "react";
-import { Card, Button, Form } from "react-bootstrap";
+import { Card, Button, Form, Tooltip } from "react-bootstrap";
+import TopTooltip from "../common/TopTooltip";
+import { subscribeSchema } from "@/helper/validation/user";
 const SignUpForSellter = () => {
-  const { email, handleSubmit, onChange } = SignUpSellterService();
+  const { initialValues, handleSubmit, handleValidate } = SignUpSellterService();
   return (
     <Card className="text-center mb-4">
       <Card.Header className="bg-dark"></Card.Header>
@@ -12,23 +15,41 @@ const SignUpForSellter = () => {
           If you want relevant updates occasionally, sign up for the private newsletter. Your email
           is never shared.
         </Card.Text>
-        <Form
-          className="d-flex justify-content-center align-items-center text-center mx-auto"
-          onSubmit={(e) => handleSubmit(e)}
+        <Formik
+          initialValues={initialValues}
+          validateOnBlur={true}
+          validateOnChange={false}
+          validationSchema={subscribeSchema}
+          // validate={handleValidate}
+          onSubmit={handleSubmit}
         >
-          <Form.Group className="" controlId="exampleForm.ControlInput1">
-            <Form.Control
-              type="email"
-              placeholder="name@example.com"
-              value={email}
-              onChange={(e) => onChange("email", e)}
-            />
-          </Form.Group>
+          {({ values, errors, touched, handleSubmit, handleChange, handleBlur, isSubmitting }) => (
+            <Form
+              className="d-flex justify-content-center align-items-center text-center mx-auto"
+              onSubmit={handleSubmit}
+            >
+              <Form.Group className="" controlId="exampleForm.ControlInput1">
+                <Form.Control
+                  type="email"
+                  name="email"
+                  placeholder="name@example.com"
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  value={values.email}
+                />
+              </Form.Group>
 
-          <Button variant="dark" type="submit">
-            Sign Up
-          </Button>
-        </Form>
+              <Button variant="dark" type="submit">
+                Sign Up
+              </Button>
+              {errors.email && (
+                <Tooltip placement="topRight" title={"Error"}>
+                  <Button>TR</Button>
+                </Tooltip>
+              )}
+            </Form>
+          )}
+        </Formik>
       </Card.Body>
     </Card>
   );

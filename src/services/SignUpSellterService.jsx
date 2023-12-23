@@ -1,22 +1,26 @@
 import React, { useState } from "react";
 
 const SignUpSellterService = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-  });
-  const onChange = (field, event) => {
-    setFormData({ ...formData, [field]: event.target.value });
+  const handleValidate = (values) => {
+    const errors = {};
+    if (!values.email) {
+      errors.email = "Required";
+    } else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) {
+      errors.email = "Invalid email address";
+    }
+    return errors;
   };
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log("SignupSellterService");
-    console.log(formData);
-    e.reset();
+  const initialValues = {
+    email: "",
+  };
+
+  const handleSubmit = (values) => {
+    console.log(values);
   };
   return {
-    ...formData,
+    handleValidate,
+    initialValues,
     handleSubmit,
-    onChange,
   };
 };
 
