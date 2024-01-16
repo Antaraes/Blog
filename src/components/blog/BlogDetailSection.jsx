@@ -22,13 +22,12 @@ const BlogDetailSection = ({ blog }) => {
           <Image src={facebook} alt="" width={16} height={16} />
         </div>
       </div>
-
       <p>
         {blog.body
           ? blog.body.map((item, index) => (
               <>
                 <div key={index} dangerouslySetInnerHTML={{ __html: item.content }}></div>
-                <Card className="mb-4">
+                <Card className="mb-4" key={index}>
                   <Card.Img
                     variant="top"
                     src={item.image}
@@ -57,14 +56,12 @@ const BlogDetailSection = ({ blog }) => {
         <Image src={twitter} alt="Twitter" width={16} height={16} className="mr-2" />
         <Link className="m-0 text-dark">Share on Twitter</Link>
       </div>
-      <p>
-        Tags:
-        {blog.tags.map((item, index) => (
-          <Link className="text-black mx-2" key={index}>
-            {item}
-          </Link>
-        ))}
-      </p>
+      Tags:
+      {blog.tags.map((item, index) => (
+        <Link className="text-black mx-2" key={index}>
+          {item}
+        </Link>
+      ))}
     </div>
   );
 };

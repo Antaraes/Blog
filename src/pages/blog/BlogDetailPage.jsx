@@ -2,23 +2,27 @@ import HeroSection from "@/components/blog/HeroSection";
 import React from "react";
 import { Container, Card, Image } from "react-bootstrap";
 import { Link, useLocation, useParams } from "react-router-dom";
-import { blogs } from "@/constants/blog";
 
 import BlogDetailSection from "@/components/blog/BlogDetailSection";
 import BlogListSection from "@/components/blog/BlogListSection";
 import SignUpForSellter from "@/components/blog/SignUpForSellter";
+import useFetch from "@/hooks/useFetch";
+import { getBlogDetail } from "@/api";
 
 const BlogDetailPage = () => {
-  const location = useLocation();
   const { blogId } = useParams();
-  const detailBlog = blogs.find((blog) => blog.id === parseInt(blogId, 10));
+  const response = useFetch("blogDetail", () => getBlogDetail(blogId));
+  const { isLoading, data, error } = response;
 
+  if (isLoading) {
+    return <h1>Loading</h1>;
+  }
   return (
     <Container>
       <HeroSection />
-      <BlogDetailSection blog={detailBlog} />
+      <BlogDetailSection blog={data.data} />
       <hr />
-      <BlogListSection blogId={detailBlog.id} title={"What to read next"} />
+      <BlogListSection blogId={blogId} title={"What to read next"} />
       <SignUpForSellter />
     </Container>
   );

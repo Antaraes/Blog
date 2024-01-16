@@ -1,7 +1,11 @@
-import React from "react";
+import { useQuery } from "react-query";
 
-const useFetch = () => {
-  return <div>useFetch</div>;
+const fetchData = async (apifunction) => {
+  const response = await apifunction();
+  return response.data;
+};
+const useFetch = (queryKey, api) => {
+  return useQuery(queryKey, () => fetchData(api));
 };
 
 export default useFetch;

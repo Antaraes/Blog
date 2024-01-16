@@ -5,8 +5,9 @@ const BlogCard = ({ blog, styles }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const handleClick = () => {
-    navigate(`/blog/${blog.id}`, { state: blog });
+    navigate(`/blog/${blog._id}`, { state: blog });
   };
+  console.log(blog);
   return (
     <Col
       onClick={handleClick}
@@ -14,7 +15,7 @@ const BlogCard = ({ blog, styles }) => {
       sm={12}
       className={[styles.blog, "m-6"]}
     >
-      <Card.Img variant="top" src={blog.image} />
+      <Card.Img variant="top" src={blog.url_list[0].link} />
       <Card.Title className="text-center">{blog.title}</Card.Title>
     </Col>
   );

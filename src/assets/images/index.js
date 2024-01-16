@@ -11,3 +11,7 @@ export { default as image_10 } from "@/assets/images/10.png";
 export { default as image_11 } from "@/assets/images/11.png";
 export { default as image_12 } from "@/assets/images/12.png";
 export { default as author } from "@/assets/images/author.png";
+export { default as sign } from "@/assets/images/signImage.png";
+
+export { default as google } from "@/assets/images/devicon_google.svg";
+export { default as boderHighLight } from "@/assets/icons/borderBeauty.svg";
