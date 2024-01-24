@@ -10,9 +10,11 @@ const AdminLayout = () => {
         <nav className="col-md-2 d-none d-md-block p-0 bg-light sidebar">
           <Sidebar />
         </nav>
-        <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <main className="col-md-9 ms-sm-auto col-lg-10 px-md-4 position-relative ">
           <AdminNavbar />
-          <Outlet />
+          <div className="p-5">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

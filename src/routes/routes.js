@@ -18,8 +18,8 @@ export const routes = [
     path: "/links",
   },
   {
-    name: "Projects",
-    path: "/projects",
+    name: "Write",
+    path: "/createblog",
   },
 ];
 

@@ -3,19 +3,19 @@ import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { Navigate, Outlet, useNavigate } from "react-router-dom";
 
-export const ProtectedRoutes = () => {
+export const ProtectedRoutes = ({ role, children }) => {
   const navigate = useNavigate();
   const { isAuthenticated, user } = useSelector((state) => state.user);
 
   useEffect(() => {
-    if (!isAuthenticated) {
-      toast.error(`You are not authenticated`);
-      return navigate("/auth/signin");
-    } else if (!(user.role === "admin")) {
+    if (role === "admin" && !(user && user.role === "admin")) {
       toast.error(`You are not authenticated as an admin`);
-      return navigate("/auth/signin");
+      navigate("/auth/signin");
+    } else if (!isAuthenticated) {
+      toast.error(`You are not authenticated`);
+      navigate("/auth/signin");
     }
-  }, [isAuthenticated, user, navigate]);
+  }, [isAuthenticated, user, navigate, role]);
 
   return <Outlet />;
 };

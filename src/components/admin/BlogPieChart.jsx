@@ -1,3 +1,5 @@
+import { getAllUsers, getBlogByFilter } from "@/api";
+import useFetch from "@/hooks/useFetch";
 import { Button, Card } from "antd";
 import React, { useState } from "react";
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from "recharts";
@@ -6,10 +8,6 @@ const data = [
   { name: "Pending", value: 400 },
   { name: "Approved", value: 300 },
   { name: "Rejected", value: 300 },
-];
-const userData = [
-  { name: "Suspend", value: 400 },
-  { name: "Active", value: 300 },
 ];
 
 const COLORS = ["#0088FE", "#00C49F", "#FFBB28"];
@@ -78,9 +76,17 @@ const renderActiveShape = (props) => {
 
 const BlogPieChart = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const { data: blogs, isLoading, isError } = useFetch("blogs", () => getBlogByFilter({ page: 1 }));
   const onPieEnter = (_, index) => {
     setActiveIndex(index);
   };
+
+  const data = [
+    { name: "Pending", value: blogs?.data?.pendingTotalBlogs },
+    { name: "Approved", value: blogs?.data?.approvedTotalBlogs },
+    { name: "Rejected", value: blogs?.data?.rejectTotalBlogs },
+  ];
+  console.log(blogs);
   return (
     <ResponsiveContainer width={400} height={400}>
       <PieChart>

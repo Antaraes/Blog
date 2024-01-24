@@ -1,3 +1,5 @@
+import { endLoading, startLoading } from "@/redux/blog/blogSlice";
+import { store } from "@/redux/store";
 import axios from "axios";
 
 const API = axios.create({
@@ -7,10 +9,10 @@ const API = axios.create({
 
 API.interceptors.request.use(
   (config) => {
-    const accessToken = getCookie("accessToken");
-    console.log(accessToken);
+    const accessToken = store.getState().user.accessToken;
+
     if (accessToken) {
-      config.headers["Authorization"] = `Bearer ${accessToken}`;
+      config.headers["Authorization"] = accessToken;
     }
 
     return config;
@@ -27,6 +29,7 @@ API.interceptors.request.use(
     if (publicRoutes.includes(config.url)) {
       delete config.headers["Authorization"];
     }
+
     return config;
   },
   (error) => {

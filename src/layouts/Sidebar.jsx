@@ -16,8 +16,9 @@ const Sidebar = () => {
   };
   return (
     <Navbar
-      className="bg-light border-right   d-flex flex-column align-items-center align-items-sm-start px-3 pt-2  min-vh-100 gap-4"
+      className="bg-light border-right position-fix   d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 gap-4"
       id="sidebar"
+      style={{ height: "100%", position: "fixed" }}
     >
       <Navbar.Brand as={Link} to="/admin" className="p-3">
         NORDIC ROSE

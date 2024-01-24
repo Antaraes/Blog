@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 
 const BlogListPage = () => {
   const { user, accessToken, refreshToken } = useSelector((state) => state.user);
+
   console.log("user", user, accessToken, refreshToken);
   return (
     <Container>

@@ -13,6 +13,14 @@ const AdminNavbar = () => {
       collapseOnSelect
       expand="lg"
       className="bg-body-tertiary px-5 py-3 border-bottom d-flex justify-content-between "
+      style={{
+        position: "fixed",
+        zIndex: "999",
+        width: "85%",
+        padding: "16px 20px 30px 20px",
+        top: "0",
+        right: "0",
+      }}
     >
       <Navbar.Brand to="/">{currentRoute ? currentRoute.name : "Unknown"}</Navbar.Brand>
       <div className="d-flex align-items-center gap-3">

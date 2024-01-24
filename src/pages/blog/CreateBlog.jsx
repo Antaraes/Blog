@@ -17,12 +17,13 @@ const CreateBlog = () => {
   const [value, setValue] = useState("");
   const [linkForm, setLinkForm] = useState([
     {
-      no: "",
-      size: "",
+      Title: "",
+      Content: "",
       links: [
         {
           link: "",
           uploadType: "",
+          preview: null,
         },
       ],
     },
@@ -32,12 +33,13 @@ const CreateBlog = () => {
     setLinkForm((prevLinkForm) => [
       ...prevLinkForm,
       {
-        no: "",
-        size: "",
+        Title: "",
+        Content: "",
         links: [
           {
             link: "",
             uploadType: "",
+            preview: null,
           },
         ],
       },
@@ -80,7 +82,21 @@ const CreateBlog = () => {
   const module = {
     toolbar: toolbarOptions,
   };
-  console.log(value);
+  const handleImageChange = (sectionIndex, linkIndex, event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setLinkForm((prevLinkForm) => {
+          const newLinkForm = [...prevLinkForm];
+          newLinkForm[sectionIndex].links[linkIndex].link = file;
+          newLinkForm[sectionIndex].links[linkIndex].preview = reader.result;
+          return newLinkForm;
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
   return (
     <div>
       <form onSubmit={handleSubmit}>
@@ -115,17 +131,19 @@ const CreateBlog = () => {
 
             {section.links.map((link, linkIndex) => (
               <div key={linkIndex}>
-                <label htmlFor={`link${sectionIndex}_${linkIndex}`}>Link:</label>
+                <label htmlFor={`link${sectionIndex}_${linkIndex}`}>Image:</label>
                 <input
-                  type="text"
+                  type="file"
                   name={`link${sectionIndex}_${linkIndex}`}
-                  value={link.link}
-                  onChange={(e) => {
-                    const newLinkForm = [...linkForm];
-                    newLinkForm[sectionIndex].links[linkIndex].link = e.target.value;
-                    setLinkForm(newLinkForm);
-                  }}
+                  onChange={(e) => handleImageChange(sectionIndex, linkIndex, e)}
                 />
+                {link.preview && (
+                  <img
+                    src={link.preview}
+                    alt={`Preview ${linkIndex}`}
+                    style={{ maxWidth: "100px", maxHeight: "100px" }}
+                  />
+                )}
                 <label htmlFor={`uploadType${sectionIndex}_${linkIndex}`}>Upload Type:</label>
                 <input
                   type="text"

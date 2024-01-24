@@ -1,12 +1,10 @@
+import { getAllUsers } from "@/api";
+import useFetch from "@/hooks/useFetch";
 import { Button, Card } from "antd";
 import React, { useState } from "react";
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from "recharts";
 
-const data = [
-  { name: "Suspend", value: 400 },
-  { name: "Active", value: 300 },
-];
-const COLORS = ["#0088FE", "#00C49F", "#FFBB28"];
+const COLORS = ["#00C49F", "#c4041e", "#FFBB28"];
 const renderActiveShape = (props) => {
   const RADIAN = Math.PI / 180;
   const {
@@ -71,6 +69,23 @@ const renderActiveShape = (props) => {
 };
 
 const UserPieChat = () => {
+  const {
+    data: users,
+    isLoading,
+    isError,
+  } = useFetch("users", () =>
+    getAllUsers({
+      skip: 0,
+      limit: 5,
+      sortBy: "email",
+      order: "desc",
+    })
+  );
+
+  const data = [
+    { name: "Active", value: users?.data?.activeTotalUsers },
+    { name: "Suspend", value: users?.data?.suspendedTotalUsers },
+  ];
   const [activeIndex, setActiveIndex] = useState(0);
   const onPieEnter = (_, index) => {
     setActiveIndex(index);

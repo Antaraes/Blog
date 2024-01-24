@@ -17,6 +17,7 @@ import Category from "@/pages/admin/Category";
 import BlackList from "@/pages/admin/BlackList";
 import UserList from "@/pages/admin/UserList";
 import { ProtectedRoutes } from "@/middleware/ProtectedRoute";
+import ProfilePage from "@/pages/ProfilePage";
 
 const MainRouter = () => {
   const routes = createBrowserRouter([
@@ -47,11 +48,11 @@ const MainRouter = () => {
         },
         {
           path: "/createblog",
-          element: (
-            <ProtectedRoutes>
-              <CreateBlog />
-            </ProtectedRoutes>
-          ),
+          element: <CreateBlog />,
+        },
+        {
+          path: "/me",
+          element: <ProfilePage />,
         },
         {
           path: "/blog/:blogId",
@@ -73,7 +74,7 @@ const MainRouter = () => {
             {
               path: "/admin/blogsList",
               element: (
-                <ProtectedRoutes>
+                <ProtectedRoutes role="admin">
                   <BlogList />
                 </ProtectedRoutes>
               ),
@@ -81,7 +82,7 @@ const MainRouter = () => {
             {
               path: "/admin/userList",
               element: (
-                <ProtectedRoutes>
+                <ProtectedRoutes role="admin">
                   <UserList />
                 </ProtectedRoutes>
               ),
@@ -89,7 +90,7 @@ const MainRouter = () => {
             {
               path: "/admin/admin_management",
               element: (
-                <ProtectedRoutes>
+                <ProtectedRoutes role="admin">
                   <AdminManagment />
                 </ProtectedRoutes>
               ),
@@ -97,7 +98,7 @@ const MainRouter = () => {
             {
               path: "/admin/category",
               element: (
-                <ProtectedRoutes>
+                <ProtectedRoutes role="admin">
                   <Category />
                 </ProtectedRoutes>
               ),
@@ -105,7 +106,7 @@ const MainRouter = () => {
             {
               path: "/admin/block_list",
               element: (
-                <ProtectedRoutes>
+                <ProtectedRoutes role="admin">
                   <BlackList />
                 </ProtectedRoutes>
               ),

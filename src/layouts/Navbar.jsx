@@ -1,5 +1,8 @@
+import { author } from "@/assets/images";
 import { addAccessToken, addRefreshToken, addUser, logout } from "@/redux/user/userSlice";
 import { routes } from "@/routes/routes";
+import { useRef } from "react";
+import { Dropdown, DropdownButton, Image } from "react-bootstrap";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
@@ -10,6 +13,17 @@ function NavigationBar() {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const dropdownRef = useRef(null);
+
+  const handleDropdownToggle = () => {
+    const dropdown = dropdownRef.current;
+    if (dropdown) {
+      const dropdownButton = dropdown.querySelector(".dropdown-toggle");
+      if (dropdownButton) {
+        dropdownButton.click();
+      }
+    }
+  };
   const { isAuthenticated, user } = useSelector((state) => state.user);
   const handleLogout = () => {
     dispatch(logout());
@@ -43,9 +57,33 @@ function NavigationBar() {
                 </Nav.Link>
               </Nav.Item>
             ))}
-            <Nav.Item>
+            <Nav.Item className=" d-md-flex justify-content-md-center align-items-center">
               {isAuthenticated ? (
-                <Nav.Link onClick={() => handleLogout()}>Logout</Nav.Link>
+                <>
+                  <Dropdown data-bs-theme="dark" style={{ background: "transparent" }}>
+                    <Dropdown.Toggle
+                      id="dropdown-button-dark-example1"
+                      style={{ background: "transparent", outline: "none", border: "0" }}
+                    >
+                      <Image
+                        src={author}
+                        alt="you"
+                        roundedCircle
+                        className=" "
+                        width={40}
+                        style={{ cursor: "pointer" }}
+                      />
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu>
+                      <Dropdown.Item to={"/me"} as={Link} active>
+                        Profile
+                      </Dropdown.Item>
+
+                      <Dropdown.Item onClick={() => handleLogout()}>Logout</Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </>
               ) : (
                 <Nav.Link as={Link} to={"/auth/signin"}>
                   Sign In

@@ -1,7 +1,10 @@
+import { getAllUsers, getBlogByFilter } from "@/api";
 import { user } from "@/assets/dashboard";
+import useFetch from "@/hooks/useFetch";
 import React from "react";
 import { Button, Card, Image } from "react-bootstrap";
 import CountUp from "react-countup";
+import Spinner from "../Spinner";
 
 const StatifiesCard = ({ title, count }) => {
   return (
@@ -19,26 +22,39 @@ const StatifiesCard = ({ title, count }) => {
   );
 };
 
-const data = [
-  {
-    title: "Total user",
-    count: 100,
-  },
-  {
-    title: "Total Blog",
-    count: 200,
-  },
-  {
-    title: "Total Pending Blog",
-    count: 100,
-  },
-  {
-    title: "Total Income",
-    count: 100,
-  },
-];
-
 const Statifies = () => {
+  const {
+    data: users,
+    isLoading,
+    isError,
+  } = useFetch("users", () =>
+    getAllUsers({
+      skip: 0,
+      limit: 5,
+      sortBy: "email",
+      order: "desc",
+    })
+  );
+  const { data: blogs } = useFetch("blogs", () => getBlogByFilter({ page: 1 }));
+  if (isLoading) <Spinner lg />;
+  const data = [
+    {
+      title: "Total user",
+      count: users?.data?.totalUsers,
+    },
+    {
+      title: "Total Blog",
+      count: blogs?.data?.total,
+    },
+    {
+      title: "Total Pending Blog",
+      count: 100,
+    },
+    {
+      title: "Total Income",
+      count: 100,
+    },
+  ];
   return (
     <div className="d-flex gap-3 mt-5 justify-content-between">
       {data.map((data, index) => (
