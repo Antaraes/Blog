@@ -1,18 +1,21 @@
 import React from "react";
-import { Image, Card } from "react-bootstrap";
+import { Image, Card, Carousel } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import twitter from "@/assets/icons/Vector-1.png";
 import facebook from "@/assets/icons/Vector.png";
+import { author } from "@/assets/images";
+import getTimeDuration from "@/helper/getTimeDuration";
 const BlogDetailSection = ({ blog }) => {
+  console.log("blog", blog);
   return (
     <div className="mt-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <div className="d-flex ">
-          <Image src={blog.authorImage} alt="author" roundedCircle className="mr-2 px-5" />
+          <Image src={author} alt="author" roundedCircle className="mr-2 px-5" />
           <div>
-            <p className="font-weight-bold">{blog.authorName}</p>
+            <p className="font-weight-bold">{blog.created_by.username}</p>
             <p>
-              {blog.created_at} · <span>{blog.time_to_read} min read</span>
+              {getTimeDuration(blog.createdAt)} ago · <span>{blog.time_to_read} min read</span>
             </p>
           </div>
         </div>
@@ -22,25 +25,21 @@ const BlogDetailSection = ({ blog }) => {
           <Image src={facebook} alt="" width={16} height={16} />
         </div>
       </div>
-      <p>
-        {blog.body
-          ? blog.body.map((item, index) => (
-              <>
-                <div key={index} dangerouslySetInnerHTML={{ __html: item.content }}></div>
-                <Card className="mb-4" key={index}>
-                  <Card.Img
-                    variant="top"
-                    src={item.image}
-                    width={100}
-                    height={500}
-                    alt="Blog Cover"
-                  />
-                  <Card.Title className="text-center mt-3">{item.title}</Card.Title>
-                </Card>
-              </>
-            ))
-          : "Loading..."}
-      </p>
+      <Card className="mb-4">
+        <Card.Title className="text-center mt-3">{blog.title}</Card.Title>
+      </Card>
+      <div dangerouslySetInnerHTML={{ __html: blog.content }}></div>
+      <Carousel>
+        {blog.url_list.map((item) => (
+          <Carousel.Item interval={1000}>
+            <Card.Img
+              src={item.link}
+              alt={`${item.name} images`}
+              style={{ objectFit: "cover", height: "300px" }}
+            />
+          </Carousel.Item>
+        ))}
+      </Carousel>
       <div className="d-flex border gap-4 justify-content-around mx-5 align-items-center p-2">
         <Image
           as={Link}
@@ -57,9 +56,9 @@ const BlogDetailSection = ({ blog }) => {
         <Link className="m-0 text-dark">Share on Twitter</Link>
       </div>
       Tags:
-      {blog.tags.map((item, index) => (
+      {blog.categories.map((item, index) => (
         <Link className="text-black mx-2" key={index}>
-          {item}
+          {item.name}
         </Link>
       ))}
     </div>

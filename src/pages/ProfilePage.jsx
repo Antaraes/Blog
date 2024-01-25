@@ -36,7 +36,7 @@ const ProfilePage = () => {
 
   return (
     <>
-      <div style={{ height: "50vh" }}>
+      <div style={{ height: "100%" }}>
         <Card className="bg-dark text-white" style={{ borderRadius: 0 }}>
           <Card.Img
             src={profileOverLay}
@@ -53,7 +53,7 @@ const ProfilePage = () => {
       {dataLoading ? (
         <Spinner lg />
       ) : (
-        <Container style={{ height: "100vh" }}>
+        <Container style={{ height: "100%", minHeight: "100vh" }}>
           <Tabs
             defaultActiveKey="publish"
             id="justify-tab-example"
@@ -102,7 +102,7 @@ export const ProfileBlogCard = ({ blog, handleDeleteBlog }) => (
         </div>
       </div>
 
-      <Card.Text>{blog.content}</Card.Text>
+      <Card.Text dangerouslySetInnerHTML={{ __html: blog.content.slice(0, 400) }}></Card.Text>
 
       <p>Last edited {getTimeDuration(blog.updatedAt)} ago</p>
     </Card.Body>

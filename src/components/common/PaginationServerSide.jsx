@@ -1,4 +1,5 @@
 import React from "react";
+import { Pagination } from "react-bootstrap";
 // import { InlineIcon } from '@iconify/react';
 
 export default function PaginationServerSide({ page, setPage, pageCount }) {
@@ -15,27 +16,26 @@ export default function PaginationServerSide({ page, setPage, pageCount }) {
   console.log("itemsPerPage", itemsPerPage);
 
   return (
-    <div className="w-[80%] flex justify-center items-center gap-2 mx-auto my-5">
-      <button onClick={() => handlePageChange(page - 1)}>
-        {/* <InlineIcon icon="ion:arrow-left-b" className="text-[2.5rem] text-gray-400 hover:text-white"/> */}
-        prev
-      </button>
-      {itemsPerPage <= 9 &&
-        Array.from({ length: itemsPerPage }, (_, index) => (
-          <span
-            onClick={() => handlePageChange(index + 1)}
-            className={`w-[40px] h-[40px] p-2 ${
-              page === index + 1 ? "bg-secondary text-white" : "bg-white text-black"
-            } text-center text-lg font-medium rounded-[50%] shadow-md cursor-pointer`}
-            key={index + 1}
-          >
-            {index + 1}
-          </span>
-        ))}
-      <button onClick={() => handlePageChange(page + 1)}>
-        {/* <InlineIcon icon="ion:arrow-right-b" className="text-[2.5rem] text-gray-400 hover:text-white"/> */}
-        next
-      </button>
+    <div
+      className=" gap-2 mx-auto my-5 d-flex justify-content-center align-items-center"
+      style={{ width: "100%", margin: "auto" }}
+    >
+      <Pagination>
+        <Pagination.First onClick={() => handlePageChange(page - 1)} />
+
+        {itemsPerPage <= 9 &&
+          Array.from({ length: itemsPerPage }, (_, index) => (
+            <Pagination.Item
+              onClick={() => handlePageChange(index + 1)}
+              active={page === index + 1}
+              key={index + 1}
+            >
+              {index + 1}
+            </Pagination.Item>
+          ))}
+
+        <Pagination.Last onClick={() => handlePageChange(page + 1)} />
+      </Pagination>
     </div>
   );
 }

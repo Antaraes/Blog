@@ -9,7 +9,7 @@ import Navbar from "react-bootstrap/Navbar";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
-function NavigationBar() {
+function NavigationBar({ preview }) {
   const location = useLocation();
   const navigate = useNavigate();
   const dispatch = useDispatch();

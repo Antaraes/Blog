@@ -16,7 +16,11 @@ import AdminManagment from "@/pages/admin/AdminManagment";
 import Category from "@/pages/admin/Category";
 import BlackList from "@/pages/admin/BlackList";
 import UserList from "@/pages/admin/UserList";
-import { ProtectedRoutes } from "@/middleware/ProtectedRoute";
+import {
+  ProtectedRoutes,
+  ProtectedRoutesForAdmin,
+  ProtectedRoutesForUser,
+} from "@/middleware/ProtectedRoute";
 import ProfilePage from "@/pages/ProfilePage";
 
 const MainRouter = () => {
@@ -46,10 +50,7 @@ const MainRouter = () => {
           path: "/about",
           element: <AboutPage />,
         },
-        {
-          path: "/createblog",
-          element: <CreateBlog />,
-        },
+
         {
           path: "/me",
           element: <ProfilePage />,
@@ -61,8 +62,16 @@ const MainRouter = () => {
       ],
     },
     {
+      path: "/createblog",
+      element: (
+        <ProtectedRoutesForUser>
+          <CreateBlog />
+        </ProtectedRoutesForUser>
+      ),
+    },
+    {
       path: "/admin",
-      element: <ProtectedRoutes />,
+      element: <ProtectedRoutesForAdmin />,
       children: [
         {
           element: <AdminLayout />,
@@ -73,43 +82,23 @@ const MainRouter = () => {
             },
             {
               path: "/admin/blogsList",
-              element: (
-                <ProtectedRoutes role="admin">
-                  <BlogList />
-                </ProtectedRoutes>
-              ),
+              element: <BlogList />,
             },
             {
               path: "/admin/userList",
-              element: (
-                <ProtectedRoutes role="admin">
-                  <UserList />
-                </ProtectedRoutes>
-              ),
+              element: <UserList />,
             },
             {
               path: "/admin/admin_management",
-              element: (
-                <ProtectedRoutes role="admin">
-                  <AdminManagment />
-                </ProtectedRoutes>
-              ),
+              element: <AdminManagment />,
             },
             {
               path: "/admin/category",
-              element: (
-                <ProtectedRoutes role="admin">
-                  <Category />
-                </ProtectedRoutes>
-              ),
+              element: <Category />,
             },
             {
               path: "/admin/block_list",
-              element: (
-                <ProtectedRoutes role="admin">
-                  <BlackList />
-                </ProtectedRoutes>
-              ),
+              element: <BlackList />,
             },
           ],
         },

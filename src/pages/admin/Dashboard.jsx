@@ -12,7 +12,6 @@ const Dashboard = () => {
         <BlogPieChart />
         <UserPieChat />
       </div>
-      <BlogTable />
     </>
   );
 };

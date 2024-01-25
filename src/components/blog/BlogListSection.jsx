@@ -4,12 +4,26 @@ import styles from "./BlogLisstSection.module.css";
 import * as api from "@/api/index";
 import BlogCard from "../common/BlogCard";
 import useFetch from "@/hooks/useFetch";
+import Spinner from "../Spinner";
 
 const BlogListSection = ({ blogId, title }) => {
   const { isLoading, data, error } = useFetch("blogLists", api.getAllBlog);
   const blogs = data?.data?.data;
   if (isLoading) {
-    return <h1>Loading</h1>;
+    return (
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
+        <div style={{ width: "100" }}>
+          <Spinner lg />
+        </div>
+      </div>
+    );
   }
 
   const filteredBlogs = blogs ? (blogId ? blogs.filter((blog) => blog._id !== blogId) : blogs) : [];

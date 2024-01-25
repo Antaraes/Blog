@@ -1,4 +1,4 @@
-import { getBlogByFilter, updateBlogStatus } from "@/api";
+import { changeUserStatus, getAllUsers, getBlogByFilter, updateBlogStatus } from "@/api";
 import useFetch from "@/hooks/useFetch";
 import React, { useEffect, useState } from "react";
 import { Badge, Form } from "react-bootstrap";
@@ -11,38 +11,41 @@ import { useMutation } from "react-query";
 import { format } from "date-fns";
 import { FiEdit } from "react-icons/fi";
 
-const BlogTable = () => {
-  const [blogs, setBlogs] = useState([]);
+const UserTable = () => {
+  const [users, setUsers] = useState([]);
   const dispatch = useDispatch();
   const [totalSize, setTotalSize] = useState(0);
   const [page, setPage] = useState(1);
   const [sortConfig, setSortConfig] = useState({ sortBy: "createdAt", order: "desc" });
   const [selectedBlog, setSelectedBlog] = useState(null);
   const [updatedStatus, setUpdatedStatus] = useState("");
-  const [sortBy, setSortBy] = useState("");
-  const [order, setOrder] = useState("desc");
   const pageSize = 3;
   const {
     data,
     isLoading: dataLoading,
     refetch,
-  } = useFetch("admin-blogs", () =>
-    getBlogByFilter({ page, pageSize: pageSize, sortBy: sortBy, order: order })
+  } = useFetch("admin-users", () =>
+    getAllUsers({
+      skip: 0,
+      limit: 5,
+      sortBy: "email",
+      order: "desc",
+    })
   );
-
-  console.log("sortBy: " + sortBy);
+  console.log(data);
   useEffect(() => {
     if (data) {
       refetch();
-      setBlogs(data?.data.data || []);
-      setTotalSize(data?.data.total);
+      setUsers(data?.data.users || []);
+      setTotalSize(data?.data.totalUsers);
     }
-  }, [data, page, sortBy, order]);
-  const handleSort = (sorting) => {
-    const newOrder = sorting === sortBy ? (order === "asc" ? "desc" : "asc") : "asc";
-
-    setSortBy(sorting);
-    setOrder(newOrder);
+  }, [data, page]);
+  console.log(users);
+  const handleSort = (sortBy) => {
+    setSortConfig({
+      sortBy,
+      order: sortConfig.order === "asc" ? "desc" : "asc",
+    });
   };
   const pageCount = Math.ceil(totalSize / pageSize);
 
@@ -54,29 +57,28 @@ const BlogTable = () => {
     setSelectedBlog(blog);
     setUpdatedStatus(blog.status);
   };
-  const { mutate: changeStatus, isLoading } = useMutation(
-    ({ id, status }) => updateBlogStatus(id, status),
-    {
-      onSuccess: (data) => {
-        toast.success(data.data.message);
-        setUpdatedStatus("");
-        setSelectedBlog(null);
-        refetch();
-      },
-      onError: (error) => {
-        toast.error(error.response.data.message);
-      },
-    }
-  );
+  const { mutate: changeStatus, isLoading } = useMutation(changeUserStatus, {
+    onSuccess: (data) => {
+      toast.success(data.data.message);
+      setUpdatedStatus("");
+      setSelectedBlog(null);
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(error.response.data.message);
+    },
+  });
 
-  const handleSaveChanges = async (blogId, event) => {
+  const handleSaveChanges = async (userId, event) => {
     try {
-      console.log(updatedStatus);
-      changeStatus({ id: blogId, status: updatedStatus });
+      console.log("User ID:", userId);
+      console.log("Updated Status:", updatedStatus);
+      changeStatus({ id: userId });
     } catch (error) {
-      console.error("Error updating blog status:", error);
+      console.error("Error updating user status:", error);
     }
   };
+
   if (dataLoading) {
     return <Spinner lg />;
   }
@@ -86,23 +88,15 @@ const BlogTable = () => {
       <table className="table  mb-0 bg-white" style={{ minHeight: "300px" }}>
         <thead className="bg-light">
           <tr>
-            <th>User</th>
-            <th onClick={() => handleSort("createdAt")} style={{ cursor: "pointer" }}>
-              Date<span>{sortBy === "createdAt" ? (order === "asc" ? " ↑" : " ↓") : ""}</span>
-            </th>
-            <th onClick={() => handleSort("title")}>
-              Title<span>{sortBy === "title" ? (order === "asc" ? " ↑" : " ↓") : ""}</span>
-            </th>
-            <th onClick={() => handleSort("status")}>
-              {" "}
-              Status<span>{sortBy === "status" ? (order === "asc" ? " ↑" : " ↓") : ""}</span>
-            </th>
+            <th>Name</th>
+            <th onClick={() => handleSort("title")}>Email</th>
+            <th onClick={() => handleSort("status")}>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {blogs.length > 0 &&
-            blogs.map((blog) => (
+          {users.length > 0 &&
+            users.map((blog) => (
               <tr key={blog._id}>
                 <td>
                   <div className="d-flex align-items-center">
@@ -113,13 +107,13 @@ const BlogTable = () => {
                       className="rounded-circle"
                     />
                     <div className="ms-3">
-                      <p className="fw-bold mb-1">{blog.created_by?.username}</p>
-                      <p className="text-muted mb-0">{blog.created_by?.email}</p>
+                      <p className="fw-bold mb-1">{blog.username}</p>
                     </div>
                   </div>
                 </td>
-                <td>{format(blog.createdAt, "MM/dd/yyyy")}</td>
-                <td>{blog.title}</td>
+                <td>
+                  <p className="text-muted mb-0">{blog.email}</p>
+                </td>
                 <td>
                   {selectedBlog === blog ? (
                     <Form>
@@ -129,14 +123,13 @@ const BlogTable = () => {
                           value={updatedStatus}
                           onChange={handleStatusChange}
                         >
-                          <option value="approved">Approved</option>
-                          <option value="rejected">Rejected</option>
-                          <option value="pending">Pending</option>
+                          <option value="active">active</option>
+                          <option value="suspended">suspended</option>
                         </Form.Control>
                       </Form.Group>
                     </Form>
                   ) : (
-                    <Badge bg={blog.status === "approved" ? "success" : "danger"}>
+                    <Badge bg={blog.status === "active" ? "success" : "danger"}>
                       {blog.status}
                     </Badge>
                   )}
@@ -165,11 +158,8 @@ const BlogTable = () => {
             ))}
         </tbody>
       </table>
-      <div>
-        <PaginationServerSide page={page} pageCount={pageCount} setPage={setPage} />
-      </div>
     </div>
   );
 };
 
-export default BlogTable;
+export default UserTable;

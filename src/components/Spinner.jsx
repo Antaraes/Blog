@@ -6,7 +6,7 @@ const Spinner = ({ sm, md, lg }) => {
     <div role="status">
       <BootstrapSpinner
         animation="border"
-        variant="light"
+        variant="dark"
         className={`mr-2 ${sm ? "spinner-sm" : md ? "spinner-md" : lg ? "spinner-lg" : ""}`}
       />
     </div>

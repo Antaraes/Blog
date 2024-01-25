@@ -15,7 +15,7 @@ const BlogCard = ({ blog, styles }) => {
       sm={12}
       className={[styles.blog, "m-6"]}
     >
-      <Card.Img variant="top" src={blog.url_list[0].link} />
+      {blog.url_list.length > 0 && <Card.Img variant="top" src={blog.url_list[0].link} />}
       <Card.Title className="text-center">{blog.title}</Card.Title>
     </Col>
   );
