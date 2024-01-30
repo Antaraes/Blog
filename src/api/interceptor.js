@@ -1,16 +1,18 @@
+import { endLoading, startLoading } from "@/redux/blog/blogSlice";
+import { store } from "@/redux/store";
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:8080/api/v1",
+  baseURL: "http://localhost:8880/api/v1",
   withCredentials: true,
 });
 
 API.interceptors.request.use(
   (config) => {
-    const accessToken = getCookie("accessToken");
-    console.log(accessToken);
+    const accessToken = store.getState().user.accessToken;
+
     if (accessToken) {
-      config.headers["Authorization"] = `Bearer ${accessToken}`;
+      config.headers["Authorization"] = accessToken;
     }
 
     return config;
@@ -22,11 +24,12 @@ API.interceptors.request.use(
 
 API.interceptors.request.use(
   (config) => {
-    const publicRoutes = ["/", "/event/", "/user/login", "/auth/signup_organizer"];
+    const publicRoutes = ["/", "/blog/blogs/filter", "/auth/signin", "/auth/signout"];
 
     if (publicRoutes.includes(config.url)) {
       delete config.headers["Authorization"];
     }
+
     return config;
   },
   (error) => {
