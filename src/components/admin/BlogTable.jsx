@@ -4,12 +4,15 @@ import React, { useEffect, useState } from "react";
 import { Badge, Form } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import Spinner from "../Spinner";
-import { endLoading, startLoading } from "@/redux/blog/blogSlice";
+import { addBlogs, endLoading, startLoading } from "@/redux/blog/blogSlice";
+import { RxCross2 } from "react-icons/rx";
 import toast from "react-hot-toast";
 import PaginationServerSide from "../common/PaginationServerSide";
 import { useMutation } from "react-query";
 import { format } from "date-fns";
-import { FiEdit } from "react-icons/fi";
+import Sheet from "react-modal-sheet";
+import { FiCrosshair, FiEdit } from "react-icons/fi";
+import BlogDetailPage from "@/pages/blog/BlogDetailPage";
 
 const BlogTable = () => {
   const [blogs, setBlogs] = useState([]);
@@ -21,6 +24,8 @@ const BlogTable = () => {
   const [updatedStatus, setUpdatedStatus] = useState("");
   const [sortBy, setSortBy] = useState("");
   const [order, setOrder] = useState("desc");
+  const [isOpen, setOpen] = useState(false);
+
   const pageSize = 3;
   const {
     data,
@@ -35,6 +40,7 @@ const BlogTable = () => {
     if (data) {
       refetch();
       setBlogs(data?.data.data || []);
+      dispatch(addBlogs(data?.data));
       setTotalSize(data?.data.total);
     }
   }, [data, page, sortBy, order]);
@@ -54,6 +60,10 @@ const BlogTable = () => {
     setSelectedBlog(blog);
     setUpdatedStatus(blog.status);
   };
+  const handleOpenDetail = (blog) => {
+    setSelectedBlog(blog._id);
+    setOpen(true);
+  };
   const { mutate: changeStatus, isLoading } = useMutation(
     ({ id, status }) => updateBlogStatus(id, status),
     {
@@ -69,7 +79,7 @@ const BlogTable = () => {
     }
   );
 
-  const handleSaveChanges = async (blogId, event) => {
+  const handleSaveChanges = async (blogId) => {
     try {
       console.log(updatedStatus);
       changeStatus({ id: blogId, status: updatedStatus });
@@ -77,6 +87,7 @@ const BlogTable = () => {
       console.error("Error updating blog status:", error);
     }
   };
+
   if (dataLoading) {
     return <Spinner lg />;
   }
@@ -147,18 +158,27 @@ const BlogTable = () => {
                     <button
                       type="button"
                       className="btn btn-link btn-sm btn-rounded"
-                      onClick={(event) => handleSaveChanges(blog._id, event)}
+                      onClick={() => handleSaveChanges(blog._id)}
                     >
                       {isLoading ? <Spinner sm /> : "Save"}
                     </button>
                   ) : (
-                    <button
-                      type="button"
-                      className="btn btn-link btn-sm btn-rounded"
-                      onClick={() => handleEditClick(blog)}
-                    >
-                      <FiEdit className="icon" size={20} />
-                    </button>
+                    <>
+                      <button
+                        type="button"
+                        className="btn btn-link btn-sm btn-rounded"
+                        onClick={() => handleEditClick(blog)}
+                      >
+                        <FiEdit className="icon" size={20} />
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-link btn-sm btn-rounded"
+                        onClick={() => handleOpenDetail(blog)}
+                      >
+                        Detail
+                      </button>
+                    </>
                   )}
                 </td>
               </tr>
@@ -168,6 +188,21 @@ const BlogTable = () => {
       <div>
         <PaginationServerSide page={page} pageCount={pageCount} setPage={setPage} />
       </div>
+      <Sheet snapPoints={[600]} initialSnap={0} isOpen={isOpen} onClose={() => setOpen(false)}>
+        <RxCross2
+          style={{ position: "absolute", right: 0, top: "8%" }}
+          size={30}
+          color="red"
+          onClick={() => setOpen(false)}
+        />
+        <Sheet.Container>
+          <Sheet.Header />
+          <Sheet.Scroller>
+            <BlogDetailPage id={selectedBlog} />
+          </Sheet.Scroller>
+        </Sheet.Container>
+        <Sheet.Backdrop />
+      </Sheet>
     </div>
   );
 };

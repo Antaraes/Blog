@@ -5,6 +5,7 @@ import React from "react";
 import { Button, Card, Image } from "react-bootstrap";
 import CountUp from "react-countup";
 import Spinner from "../Spinner";
+import { useSelector } from "react-redux";
 
 const StatifiesCard = ({ title, count }) => {
   return (
@@ -35,7 +36,8 @@ const Statifies = () => {
       order: "desc",
     })
   );
-  const { data: blogs } = useFetch("blogs", () => getBlogByFilter({ page: 1 }));
+  const { blogs } = useSelector((state) => state.blog);
+  console.log("first", blogs);
   if (isLoading) <Spinner lg />;
   const data = [
     {
@@ -44,11 +46,11 @@ const Statifies = () => {
     },
     {
       title: "Total Blog",
-      count: blogs?.data?.total,
+      count: blogs?.total,
     },
     {
       title: "Total Pending Blog",
-      count: 100,
+      count: blogs?.pendingTotalBlogs,
     },
     {
       title: "Total Income",

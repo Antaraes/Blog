@@ -1,4 +1,4 @@
-import { createBlog, getCategories } from "@/api";
+import { createBlog, getCategories, getUserDetails } from "@/api";
 import useFetch from "@/hooks/useFetch";
 import CreateBlogService from "@/services/CreateBlogService";
 import React, { useEffect, useRef, useState } from "react";
@@ -10,6 +10,7 @@ import {
   Image,
   Navbar,
   OverlayTrigger,
+  ProgressBar,
   Spinner,
   Tooltip,
 } from "react-bootstrap";
@@ -21,7 +22,7 @@ import ReactQuill from "react-quill";
 import twitter from "@/assets/icons/Vector-1.png";
 import facebook from "@/assets/icons/Vector.png";
 import "react-quill/dist/quill.snow.css";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import Select from "react-select";
@@ -30,10 +31,41 @@ import NavigationBar from "@/layouts/Navbar";
 import Footer from "@/layouts/Footer";
 import { author } from "@/assets/images";
 import MobileDevicePreview from "sanity-mobile-preview";
+import Dropzone from "react-dropzone";
+import { FiCloud } from "react-icons/fi";
+import { addUser } from "@/redux/user/userSlice";
 const CreateBlog = () => {
   const titleInputRef = useRef(null);
   const { data: categories, isLoading } = useFetch("categories", getCategories);
   const { accessToken, user } = useSelector((state) => state.user);
+  const [isUploading, setIsUploading] = useState(true);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const dispatch = useDispatch();
+  const startSinulatedProgress = () => {
+    setUploadProgress(0);
+    const interval = setInterval(() => {
+      setUploadProgress((prev) => {
+        if (prev >= 95) {
+          clearInterval(interval);
+          return prev;
+        }
+        return prev + 5;
+      });
+    }, 50);
+    return interval;
+  };
+  const [options, setOptions] = useState(null);
+
+  useEffect(() => {
+    if (categories) {
+      const option = categories.data.map((item) => ({
+        value: item._id,
+        label: item.name,
+      }));
+      setOptions(option);
+    }
+  }, [categories]);
+
   const {
     handleAddImageButton,
     handleCategoryChange,
@@ -44,16 +76,64 @@ const CreateBlog = () => {
     handleImageChange,
     createBlogMutation,
     setBlog,
+    selectedOptions,
   } = CreateBlogService();
   const navigate = useNavigate();
   const [time, setTime] = useState("");
+  const { data: userData, refetch } = useFetch("me", getUserDetails);
+  console.log(userData);
 
   useEffect(() => {
     if (!accessToken) {
       toast.error("Please sign In");
       navigate("/auth/signin");
     }
+    if (userData && userData?.status === "suspended") {
+      toast.error("Your suspended please check your email");
+      navigate("/blog");
+    }
   }, [accessToken]);
+  const UploadDropZone = ({ linkIndex }) => {
+    return (
+      <Dropzone
+        onDrop={async (acceptedFiles) => {
+          setIsUploading(true);
+          const progressInterval = startSinulatedProgress();
+
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+
+          clearInterval(progressInterval);
+          setUploadProgress(100);
+          setIsUploading(false);
+
+          handleImageChange(linkIndex, acceptedFiles[0]);
+        }}
+      >
+        {({ getRootProps, getInputProps, acceptedFiles }) => (
+          <div
+            {...getRootProps()}
+            className="border m-4"
+            style={{ borderColor: "gray", borderRadius: "20px", height: "10rem" }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100%",
+              }}
+            >
+              <FiCloud size={30} />
+              <p style={{ color: "#8888" }}>
+                <span>Click to upload</span> or drag and rop
+              </p>
+            </div>
+            {isUploading ? <ProgressBar now={uploadProgress} /> : null}
+          </div>
+        )}
+      </Dropzone>
+    );
+  };
 
   const quillModules = {
     toolbar: [
@@ -100,7 +180,10 @@ const CreateBlog = () => {
       <strong>publish post</strong>
     </Tooltip>
   );
-
+  if (isLoading) {
+    return <Spinner lg />;
+  }
+  console.log(uploadProgress);
   return (
     <>
       <Navbar className="d-flex justify-content-between align-items-center border mb-3">
@@ -157,41 +240,47 @@ const CreateBlog = () => {
               <Select
                 isMulti
                 id="categories"
-                options={categories?.data.map((item) => ({ value: item.name, label: item.name }))}
-                value={blog.categories.map((category) => ({
-                  value: category,
-                  label: category,
-                }))}
+                options={options}
+                value={options?.filter((option) => selectedOptions.includes(option.value))}
                 onChange={handleCategoryChange}
               />
 
               {blog.files.map((file, linkIndex) => (
                 <div key={linkIndex}>
-                  <label htmlFor={`image${linkIndex}`}>Image:</label>
                   {file.preview ? (
-                    <div>
-                      <img
-                        src={file.preview}
-                        alt={`Preview ${linkIndex}`}
-                        style={{ maxWidth: "100px", maxHeight: "100px" }}
-                      />
-                      <button type="button" onClick={() => handleRemoveImage(linkIndex)}>
-                        Remove Image
-                      </button>
+                    <div className="position-relative">
+                      <div
+                        className="image-container"
+                        style={{ position: "relative", maxWidth: "400px", maxHeight: "400px" }}
+                      >
+                        <img
+                          src={file.preview}
+                          alt={`Preview ${linkIndex}`}
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
+                        <div className="overlay"></div>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveImage(linkIndex)}
+                          className="delete-button"
+                        >
+                          <h1 style={{ color: "white" }}>Remove</h1>
+                        </button>
+                      </div>
                     </div>
                   ) : (
-                    <input
-                      type="file"
-                      id={`image${linkIndex}`}
-                      onChange={(e) => handleImageChange(linkIndex, e)}
-                    />
+                    <UploadDropZone linkIndex={linkIndex} key={`image${linkIndex}`} />
                   )}
                 </div>
               ))}
 
-              <button type="button" onClick={handleAddImageButton}>
+              <Button
+                style={{ height: "100%", display: "block" }}
+                variant="dark"
+                onClick={handleAddImageButton}
+              >
                 Add Image
-              </button>
+              </Button>
               <Button
                 onClick={handleCleanCurrentBlog}
                 style={{ height: "100%", display: "block" }}
@@ -232,7 +321,7 @@ const CreateBlog = () => {
               <div className="p-2">
                 <h1>{blog.title}</h1>
                 <div dangerouslySetInnerHTML={{ __html: blog.content }}></div>
-                {blog.files[0].preview !== null && (
+                {blog.files.length > 0 && (
                   <Carousel>
                     {blog.files.map((item) => (
                       <Carousel.Item interval={1000}>

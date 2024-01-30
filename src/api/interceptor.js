@@ -1,9 +1,11 @@
 import { endLoading, startLoading } from "@/redux/blog/blogSlice";
 import { store } from "@/redux/store";
 import axios from "axios";
+import { refreshGenerateToken } from ".";
+import { addAccessToken, logout } from "@/redux/user/userSlice";
 
 const API = axios.create({
-  baseURL: "http://localhost:8880/api/v1",
+  baseURL: "http://10.1.40.36:8880/api/v1",
   withCredentials: true,
 });
 
@@ -33,6 +35,26 @@ API.interceptors.request.use(
     return config;
   },
   (error) => {
+    return Promise.reject(error);
+  }
+);
+API.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const refreshToken = store.getState().user.refreshToken;
+
+    if (error.response && error.response.status === 500) {
+      try {
+        const response = await refreshGenerateToken(refreshToken);
+        const newAccessToken = response.data.data;
+        console.log(newAccessToken);
+        store.dispatch(addAccessToken(newAccessToken));
+      } catch (refreshError) {
+        store.dispatch(logout());
+        return Promise.reject(refreshError);
+      }
+    }
+
     return Promise.reject(error);
   }
 );

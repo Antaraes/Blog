@@ -3,9 +3,12 @@ import useFetch from "@/hooks/useFetch";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useMutation } from "react-query";
+import { useNavigate } from "react-router-dom";
 
 const CreateBlogService = () => {
+  const navigate = useNavigate();
   const titleInputRef = useRef(null);
+  const [selectedOptions, setSelectedOptions] = useState([]);
 
   const [blog, setBlog] = useState({
     title: "",
@@ -37,6 +40,7 @@ const CreateBlogService = () => {
         time_to_read: "",
       });
       toast.success(data.data.message);
+      navigate("/blog");
     },
     onError: (error) => {
       toast.error(error.response.data.message);
@@ -76,32 +80,55 @@ const CreateBlogService = () => {
 
     await createBlogMutation.mutateAsync(formData);
   };
-
-  const handleCategoryChange = (selectedCategories) => {
+  const handleCategoryChange = (selectedValues) => {
+    const selectedIds = selectedValues ? selectedValues.map((option) => option.value) : [];
+    setSelectedOptions(selectedIds);
     setBlog((prevBlog) => ({
       ...prevBlog,
-      categories: selectedCategories ? selectedCategories.map((category) => category.value) : [],
+      categories: selectedIds,
     }));
   };
 
-  const handleImageChange = (linkIndex, event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setBlog((prevBlog) => ({
+  // const handleCategoryChange = (selectedCategories) => {
+  //   setBlog((prevBlog) => ({
+  //     ...prevBlog,
+  //     categories: selectedCategories ? selectedCategories.map((category) => category.value) : [],
+  //   }));
+  // };
+
+  const handleImageChange = (linkIndex, file) => {
+    // const file = event.target.files[0];
+    // if (file) {
+    //   const reader = new FileReader();
+    //   reader.onloadend = () => {
+    //     setBlog((prevBlog) => ({
+    //       ...prevBlog,
+    //       files: [
+    //         ...prevBlog.files,
+    //         {
+    //           link: file,
+    //           preview: reader.result,
+    //         },
+    //       ],
+    //     }));
+    //   };
+    //   reader.readAsDataURL(file);
+    // }
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setBlog((prevBlog) => {
+        const updatedFiles = [...prevBlog.files];
+        updatedFiles[linkIndex] = {
+          link: file,
+          preview: reader.result,
+        };
+        return {
           ...prevBlog,
-          files: [
-            ...prevBlog.files,
-            {
-              link: file,
-              preview: reader.result,
-            },
-          ],
-        }));
-      };
-      reader.readAsDataURL(file);
-    }
+          files: updatedFiles,
+        };
+      });
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleRemoveImage = (linkIndex) => {
@@ -135,6 +162,7 @@ const CreateBlogService = () => {
     handleAddImageButton,
     handleRemoveImage,
     handleCleanCurrentBlog,
+    selectedOptions,
     handleCategoryChange,
     handleSubmit,
     handleImageChange,

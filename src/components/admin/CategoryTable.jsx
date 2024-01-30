@@ -1,46 +1,34 @@
-import { changeUserStatus, getAllUsers, getBlogByFilter, updateBlogStatus } from "@/api";
+import { deleteCategories, getCategories } from "@/api";
 import useFetch from "@/hooks/useFetch";
 import React, { useEffect, useState } from "react";
-import { Badge, Form, OverlayTrigger, Tooltip } from "react-bootstrap";
+import { Badge, OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useSelector, useDispatch } from "react-redux";
 import Spinner from "../Spinner";
 import { endLoading, startLoading } from "@/redux/blog/blogSlice";
 import toast from "react-hot-toast";
 import PaginationServerSide from "../common/PaginationServerSide";
 import { useMutation } from "react-query";
+import { FiEdit, FiTrash } from "react-icons/fi";
 import { format } from "date-fns";
-import { FiEdit } from "react-icons/fi";
 
-const UserTable = () => {
-  const [users, setUsers] = useState([]);
+const CategoryTable = () => {
+  const [categories, setCategories] = useState([]);
   const dispatch = useDispatch();
   const [totalSize, setTotalSize] = useState(0);
   const [page, setPage] = useState(1);
   const [sortConfig, setSortConfig] = useState({ sortBy: "createdAt", order: "desc" });
-  const [selectedBlog, setSelectedBlog] = useState(null);
+  const [selectedCategory, setSelectedCategory] = useState(null);
   const [updatedStatus, setUpdatedStatus] = useState("");
   const pageSize = 3;
-  const {
-    data,
-    isLoading: dataLoading,
-    refetch,
-  } = useFetch("admin-users", () =>
-    getAllUsers({
-      skip: 0,
-      limit: 5,
-      sortBy: "email",
-      order: "desc",
-    })
-  );
-  console.log(data);
+  const { data, isLoading: dataLoading, refetch } = useFetch("categories", () => getCategories());
+  console.log("Category", data);
   useEffect(() => {
     if (data) {
       refetch();
-      setUsers(data?.data.users || []);
-      setTotalSize(data?.data.totalUsers);
+      setCategories(data?.data || []);
     }
   }, [data, page]);
-  console.log(users);
+  console.log(categories);
   const handleSort = (sortBy) => {
     setSortConfig({
       sortBy,
@@ -49,19 +37,19 @@ const UserTable = () => {
   };
   const pageCount = Math.ceil(totalSize / pageSize);
 
-  //Edit Status
+  // Edit Status
   const handleStatusChange = (event) => {
     setUpdatedStatus(event.target.value);
   };
-  const handleEditClick = (blog) => {
-    setSelectedBlog(blog);
-    setUpdatedStatus(blog.status);
+  const handleEditClick = (category) => {
+    setSelectedCategory(category);
+    setUpdatedStatus(category.status);
   };
-  const { mutate: changeStatus, isLoading } = useMutation(changeUserStatus, {
+  const { mutate: deleteCategory, isLoading } = useMutation(deleteCategories, {
     onSuccess: (data) => {
       toast.success(data.data.message);
       setUpdatedStatus("");
-      setSelectedBlog(null);
+      setSelectedCategory(null);
       refetch();
     },
     onError: (error) => {
@@ -69,13 +57,12 @@ const UserTable = () => {
     },
   });
 
-  const handleSaveChanges = async (userId, event) => {
+  const handleSaveChanges = async (categoryId, event) => {
     try {
-      console.log("User ID:", userId);
-      console.log("Updated Status:", updatedStatus);
-      changeStatus({ id: userId });
+      console.log("Category ID:", categoryId);
+      deleteCategory(categoryId);
     } catch (error) {
-      console.error("Error updating user status:", error);
+      console.error("Error updating category status:", error);
     }
   };
 
@@ -84,53 +71,54 @@ const UserTable = () => {
   }
   const postToolTip = (
     <Tooltip id="tooltip">
-      <strong>Change Status</strong>
+      <strong>Delete Category</strong>
     </Tooltip>
   );
   console.log(isLoading, dataLoading);
   return (
     <div>
-      <table className="table  mb-0 bg-white" style={{ minHeight: "300px" }}>
+      <table
+        className="table  mb-0 bg-white"
+        style={{ minHeight: "300px", maxHeight: "100vh", overflowY: "scroll" }}
+      >
         <thead className="bg-light">
           <tr>
             <th>Name</th>
-            <th onClick={() => handleSort("title")}>Email</th>
-            <th onClick={() => handleSort("status")}>Status</th>
+            <th onClick={() => handleSort("createdAt")}>CreatedAt</th>
+            <th onClick={() => handleSort("created_by")}>Created By</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {users.length > 0 &&
-            users.map((blog) => (
-              <tr key={blog._id}>
+          {categories.length > 0 &&
+            categories.map((category) => (
+              <tr key={category._id}>
                 <td>
-                  <div className="d-flex align-items-center">
+                  <p className="fw-bold mb-1">{category.name}</p>
+                </td>
+                <td>
+                  <p className="text-muted mb-0">{format(category.createdAt, "MM/dd/yyyy")}</p>
+                </td>
+                <td>
+                  <div className="d-flex align-items-center gap-3">
                     <img
-                      src="https://mdbootstrap.com/img/new/avatars/8.jpg"
+                      src={category.image || "https://mdbootstrap.com/img/new/avatars/8.jpg"}
                       alt=""
                       style={{ width: 45, height: 45 }}
                       className="rounded-circle"
                     />
-                    <div className="ms-3">
-                      <p className="fw-bold mb-1">{blog.username}</p>
-                    </div>
+                    <p>{category.created_by.username}</p>
                   </div>
-                </td>
-                <td>
-                  <p className="text-muted mb-0">{blog.email}</p>
-                </td>
-                <td>
-                  <Badge bg={blog.status === "active" ? "success" : "danger"}>{blog.status}</Badge>
                 </td>
                 <td>
                   <OverlayTrigger placement="top" overlay={postToolTip}>
                     <button
                       type="button"
-                      disabled={blog.status === "deleted" && true}
+                      disabled={category.status === "deleted" && true}
                       className="btn btn-link btn-sm btn-rounded"
-                      onClick={(event) => handleSaveChanges(blog._id, event)}
+                      onClick={(event) => handleSaveChanges(category._id, event)}
                     >
-                      {isLoading ? <Spinner sm /> : <FiEdit size={20} />}
+                      {isLoading ? <Spinner sm /> : <FiTrash size={20} />}
                     </button>
                   </OverlayTrigger>
                 </td>
@@ -142,4 +130,4 @@ const UserTable = () => {
   );
 };
 
-export default UserTable;
+export default CategoryTable;

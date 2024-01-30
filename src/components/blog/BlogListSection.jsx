@@ -8,7 +8,9 @@ import Spinner from "../Spinner";
 
 const BlogListSection = ({ blogId, title }) => {
   const { isLoading, data, error } = useFetch("blogLists", api.getAllBlog);
-  const blogs = data?.data?.data;
+
+  const blogs = data?.data;
+  console.log(blogs);
   if (isLoading) {
     return (
       <div
@@ -20,7 +22,7 @@ const BlogListSection = ({ blogId, title }) => {
         }}
       >
         <div style={{ width: "100" }}>
-          <Spinner lg />
+          <Spinner lg  />
         </div>
       </div>
     );

@@ -2,6 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   blog: {},
+  blogs: [],
   isLoading: false,
 };
 
@@ -12,6 +13,9 @@ const blogSlice = createSlice({
     addBlog: (state, action) => {
       state.blog = action.payload;
     },
+    addBlogs: (state, action) => {
+      state.blogs = action.payload;
+    },
     startLoading: (state) => {
       state.isLoading = true;
     },
@@ -21,5 +25,5 @@ const blogSlice = createSlice({
   },
 });
 
-export const { addBlog, startLoading, endLoading } = blogSlice.actions;
+export const { addBlog, startLoading, endLoading, addBlogs } = blogSlice.actions;
 export default blogSlice.reducer;

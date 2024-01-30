@@ -1,3 +1,4 @@
+import { deleteAccount } from "@/api";
 import { author } from "@/assets/images";
 import { addAccessToken, addRefreshToken, addUser, logout } from "@/redux/user/userSlice";
 import { routes } from "@/routes/routes";
@@ -6,6 +7,7 @@ import { Dropdown, DropdownButton, Image } from "react-bootstrap";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
+import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
@@ -27,6 +29,11 @@ function NavigationBar({ preview }) {
   const { isAuthenticated, user } = useSelector((state) => state.user);
   const handleLogout = () => {
     dispatch(logout());
+    navigate("/auth/signin");
+  };
+  const handleDeleteAccount = async () => {
+    await deleteAccount();
+    toast.success("Account deleted");
     navigate("/auth/signin");
   };
 
@@ -79,6 +86,7 @@ function NavigationBar({ preview }) {
                       <Dropdown.Item to={"/me"} as={Link} active>
                         Profile
                       </Dropdown.Item>
+                      <Dropdown.Item onClick={handleDeleteAccount}>Delete Account</Dropdown.Item>
 
                       <Dropdown.Item onClick={() => handleLogout()}>Logout</Dropdown.Item>
                     </Dropdown.Menu>

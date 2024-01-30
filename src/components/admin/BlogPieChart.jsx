@@ -2,6 +2,7 @@ import { getAllUsers, getBlogByFilter } from "@/api";
 import useFetch from "@/hooks/useFetch";
 import { Button, Card } from "antd";
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
 import { PieChart, Pie, Sector, Cell, ResponsiveContainer } from "recharts";
 
 const data = [
@@ -76,15 +77,21 @@ const renderActiveShape = (props) => {
 
 const BlogPieChart = () => {
   const [activeIndex, setActiveIndex] = useState(0);
-  const { data: blogs, isLoading, isError } = useFetch("blogs", () => getBlogByFilter({ page: 1 }));
+  const { blogs } = useSelector((state) => state.blog);
+  console.log(blogs);
+  const page = 1;
+  const pageSize = 4;
+  const sortBy = "createdAt";
+  const order = "desc";
+
   const onPieEnter = (_, index) => {
     setActiveIndex(index);
   };
 
   const data = [
-    { name: "Pending", value: blogs?.data?.pendingTotalBlogs },
-    { name: "Approved", value: blogs?.data?.approvedTotalBlogs },
-    { name: "Rejected", value: blogs?.data?.rejectTotalBlogs },
+    { name: "Pending", value: blogs?.pendingTotalBlogs },
+    { name: "Approved", value: blogs?.approvedTotalBlogs },
+    { name: "Rejected", value: blogs?.rejectTotalBlogs },
   ];
   console.log(blogs);
   return (

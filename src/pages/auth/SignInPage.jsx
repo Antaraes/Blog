@@ -95,7 +95,7 @@ const SignInPage = () => {
                   </Button>
                   <p className=" p-md-4 text-center">or</p>
                   <Button className="w-100" style={styles.button} variant="dark" type="submit">
-                    {isLoading ? <Spinner sm /> : "Sign In"}
+                    {isLoading ? <Spinner sm light /> : "Sign In"}
                   </Button>
                 </div>
               </Form>

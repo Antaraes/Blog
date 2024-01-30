@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
 import Layout from "@/layouts/Layout";
 import HomePage from "@/pages/HomePage";
@@ -22,6 +22,10 @@ import {
   ProtectedRoutesForUser,
 } from "@/middleware/ProtectedRoute";
 import ProfilePage from "@/pages/ProfilePage";
+import useFetch from "@/hooks/useFetch";
+import { getUserDetails } from "@/api";
+import { store } from "@/redux/store";
+import { addUser } from "@/redux/user/userSlice";
 
 const MainRouter = () => {
   const routes = createBrowserRouter([

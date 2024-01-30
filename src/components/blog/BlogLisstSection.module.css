@@ -1,6 +1,7 @@
 .section {
   width: 60%;
   margin: auto;
+  height: auto;
   margin-bottom: 10rem;
 }
 .blog {

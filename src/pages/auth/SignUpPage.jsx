@@ -79,7 +79,7 @@ const SignUpPage = () => {
                 ))}
                 <div className="d-md-flex justify-content-between align-items-center">
                   <Button className="w-100" style={styles.button} variant="dark" type="submit">
-                    {isLoading ? <Spinner sm /> : "Sign Up"}
+                    {isLoading ? <Spinner sm light /> : "Sign Up"}
                   </Button>
                   <p className=" p-md-4 text-center">or</p>
                   <Button

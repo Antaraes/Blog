@@ -15,8 +15,11 @@ export const createBlog = (data) =>
 export const signInUser = (user) => API.post("/auth/signin", user);
 export const signUpUser = (user) => API.post("/auth/signup", user);
 export const getUserDetails = () => API.get("/user/me");
+export const deleteAccount = () => API.delete("/user/");
+export const refreshGenerateToken = (token) => API.post("/auth/refresh_token", { token });
 
 export const getAllUsers = (params) => API.get("/user/filter", { params });
-export const changeUserStatus = (id) => API.patch("/user/change_status", { id });
+export const changeUserStatus = (id) => API.patch("/user/change_status", id);
 //categories
 export const getCategories = () => API.get("/category");
+export const deleteCategories = (categoryId) => API.delete("/category", { data: { categoryId } });

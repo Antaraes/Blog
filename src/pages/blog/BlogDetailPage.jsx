@@ -10,14 +10,15 @@ import useFetch from "@/hooks/useFetch";
 import { getBlogDetail } from "@/api";
 import Spinner from "@/components/Spinner";
 
-const BlogDetailPage = () => {
+const BlogDetailPage = ({ id }) => {
   const { blogId } = useParams();
 
-  const response = useFetch("blogDetail", () => getBlogDetail(blogId));
+  console.log(id);
+  const response = useFetch("blogDetail", () => getBlogDetail(blogId || id));
   const { isLoading, data, error, refetch } = response;
   useEffect(() => {
     refetch();
-  }, [blogId]);
+  }, [blogId || id]);
   if (isLoading) {
     return (
       <div
@@ -39,8 +40,12 @@ const BlogDetailPage = () => {
     <Container>
       <BlogDetailSection blog={data.data} />
       <hr />
-      <BlogListSection blogId={blogId} title={"What to read next"} />
-      <SignUpForSellter />
+      {!id && (
+        <>
+          <BlogListSection blogId={blogId} title={"What to read next"} />
+          <SignUpForSellter />
+        </>
+      )}
     </Container>
   );
 };
